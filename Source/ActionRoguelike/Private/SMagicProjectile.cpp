@@ -12,7 +12,7 @@ ASMagicProjectile::ASMagicProjectile()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
-	//create instances of components
+	//create instance of component
 	SphereComp = CreateDefaultSubobject<USphereComponent>("SphereComp");
 
 	//Examples
