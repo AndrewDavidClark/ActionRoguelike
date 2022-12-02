@@ -37,6 +37,15 @@ AAC_ExplosiveBarrel::AAC_ExplosiveBarrel()
 
 }
 
+
+
+void AAC_ExplosiveBarrel::Interact_Implementation(APawn* InstigatorPawn)
+{
+	//MeshComp->SetRelativeRotation(FRotator(110, 0, 0));
+	ForceComp->FireImpulse();
+	UE_LOG(LogTemp, Log, TEXT("Shouldhaveblown"));
+}
+
 void AAC_ExplosiveBarrel::PostInitializeComponents()
 {
 	//Calls parent function
@@ -57,7 +66,7 @@ void AAC_ExplosiveBarrel::BeginPlay()
 void AAC_ExplosiveBarrel::OnActorHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
 	ForceComp->FireImpulse();
-
+	
 	UE_LOG(LogTemp, Log, TEXT("OnActorHit in Explosive Barrel"));
 
 	// %s = string

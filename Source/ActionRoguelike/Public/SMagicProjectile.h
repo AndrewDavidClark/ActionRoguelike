@@ -21,13 +21,13 @@ public:
 
 protected:
 	//basic sphere collision
-	UPROPERTY(VisibleAnywhere)
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 		USphereComponent* SphereComp;
 	//projectile straight line velocity
-	UPROPERTY(VisibleAnywhere)
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 		UProjectileMovementComponent* MovementComp;
 	//something to show in the world
-	UPROPERTY(VisibleAnywhere)
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 		UParticleSystemComponent* EffectComp;
 
 	// Called when the game starts or when spawned
