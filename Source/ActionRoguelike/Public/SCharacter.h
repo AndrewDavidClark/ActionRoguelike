@@ -53,8 +53,8 @@ protected:
 	UCameraComponent* CameraComp;
 	UPROPERTY(VisibleAnywhere)
 	USInteractionComponent* InteractionComp;
-	//UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
-	//USAttributeComponent* AttributeComp;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
+	USAttributeComponent* AttributeComp;
 
 	
 	// Called when the game starts or when spawned
