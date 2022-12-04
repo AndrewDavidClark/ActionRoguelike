@@ -6,6 +6,7 @@
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "Particles/ParticleSystemComponent.h"
 #include "Kismet/GameplayStatics.h"
+#include "SAttributeComponent.h"
 
 
 ASProjectileBase::ASProjectileBase()
@@ -27,13 +28,15 @@ ASProjectileBase::ASProjectileBase()
 }
 
 
+
+
 void ASProjectileBase::OnActorHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
 	Explode();
 }
 
 
-// _Implementation from it being marked as BlueprintNativeEvent
+// _Implementation from it being marked as BlueprintNativeEvent requires "_Implementation"
 void ASProjectileBase::Explode_Implementation()
 {
 	// Check to make sure we aren't already being 'destroyed'
@@ -42,10 +45,10 @@ void ASProjectileBase::Explode_Implementation()
 	{
 		UGameplayStatics::SpawnEmitterAtLocation(this, ImpactVFX, GetActorLocation(), GetActorRotation());
 
-		EffectComp->DeactivateSystem();
-
-		MoveComp->StopMovementImmediately();
-		SetActorEnableCollision(false);
+		//EffectComp->DeactivateSystem();
+		 
+		//MoveComp->StopMovementImmediately();
+		//SetActorEnableCollision(false);
 
 		Destroy();
 	}

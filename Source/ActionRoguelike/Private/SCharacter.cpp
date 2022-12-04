@@ -15,6 +15,8 @@ ASCharacter::ASCharacter()
 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
+	RootComponent = CreateDefaultSubobject<USceneComponent>("RootComp");
+
 	SpringArmComp = CreateDefaultSubobject<USpringArmComponent>("SpringArmComp");
 	SpringArmComp->bUsePawnControlRotation = true;
 	SpringArmComp->SetupAttachment(RootComponent);
@@ -30,6 +32,13 @@ ASCharacter::ASCharacter()
 	bUseControllerRotationYaw = false;
 
 	AttackAnimDelay = 0.2f;
+}
+
+void ASCharacter::PostInitializeComponents()
+{
+	Super::PostInitializeComponents();
+
+	AttributeComp->OnHealthChanged.AddDynamic(this, &ASCharacter::OnHealthChanged);
 }
 
 
@@ -124,12 +133,12 @@ void ASCharacter::Dash_TimeElapsed()
 	SpawnProjectile(DashProjectileClass);
 }
 
-
+//SpawnProjectile(ClassToSpawn);
 void ASCharacter::SpawnProjectile(TSubclassOf<AActor> ClassToSpawn)
 {
 	if (ensureAlways(ClassToSpawn))
 	{
-		FVector HandLocation = GetMesh()->GetSocketLocation("Muzzle_01");
+		FVector HandLocation = GetMesh()->GetSocketLocation("Muzzle_01");//get socket location and set HandLocation at it
 
 		FActorSpawnParameters SpawnParams;
 		SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
@@ -170,6 +179,20 @@ void ASCharacter::SpawnProjectile(TSubclassOf<AActor> ClassToSpawn)
 		GetWorld()->SpawnActor<AActor>(ClassToSpawn, SpawnTM, SpawnParams);
 	}
 }
+
+
+void ASCharacter::OnHealthChanged(AActor* InstigatorActor, USAttributeComponent* OwningComp, float NewHealth, float Delta)
+{
+
+	if (NewHealth <= 0.0f && Delta < 0.0f)
+	{
+		SetActorEnableCollision(false);//set collision false on death
+		//RootComponent->DestroyComponent();//Destroys Player Collision Capsule on death
+		APlayerController* PC = Cast<APlayerController>(GetController());
+		DisableInput(PC);
+	}
+}
+
 
 
 void ASCharacter::PrimaryInteract()

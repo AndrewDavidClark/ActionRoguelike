@@ -4,6 +4,7 @@
 #include "SInteractionComponent.h"
 #include <SGameplayInterface.h>
 #include <DrawDebugHelpers.h>
+#include <Kismet/KismetMathLibrary.h>
 
 
 
@@ -50,17 +51,18 @@ void USInteractionComponent::PrimaryInteract()
 	MyOwner->GetActorEyesViewPoint(EyeLocation, EyeRotation);
 
 	FVector End = EyeLocation + (EyeRotation.Vector() * 1000);
-
+	End.Y += 150;
+	
 
 	//FHitResult Hit;
 	//bool bBlockingHit = GetWorld()->LineTraceSingleByObjectType(Hit, EyeLocation, End, ObjectQueryParams);
 
 	TArray<FHitResult> Hits;
 
-	float Radius = 30.f;
+	float Radius = 60.f;
 
 	FCollisionShape Shape;
-	Shape.SetSphere(30.0f);
+	Shape.SetSphere(60.0f);
 
 	bool bBlockingHit = GetWorld()->SweepMultiByObjectType(Hits, EyeLocation, End, FQuat::Identity, ObjectQueryParams, Shape);
 

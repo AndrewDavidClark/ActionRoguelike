@@ -24,11 +24,11 @@ ASDashProjectile::ASDashProjectile()
 void ASDashProjectile::BeginPlay()
 {
 	Super::BeginPlay();
-
+	//set timer with length of DetonateDelay ex.0.2
 	GetWorldTimerManager().SetTimer(TimerHandle_DelayedDetonate, this, &ASDashProjectile::Explode, DetonateDelay);
 }
 
-
+//trigger explode
 void ASDashProjectile::Explode_Implementation()
 {
 	// Clear timer if the Explode was already called through another source like OnActorHit
@@ -38,13 +38,13 @@ void ASDashProjectile::Explode_Implementation()
 
 	//UGameplayStatics::PlaySoundAtLocation(this, ImpactSound, GetActorLocation());
 
-	//EffectComp->DeactivateSystem();
+	EffectComp->DeactivateSystem();//disable particle system
 
-	MoveComp->StopMovementImmediately();
+	MoveComp->StopMovementImmediately();//stop projectile from continuing during second delay
 	SetActorEnableCollision(false);
 
 	FTimerHandle TimerHandle_DelayedTeleport;
-	GetWorldTimerManager().SetTimer(TimerHandle_DelayedTeleport, this, &ASDashProjectile::TeleportInstigator, TeleportDelay);
+	GetWorldTimerManager().SetTimer(TimerHandle_DelayedTeleport, this, &ASDashProjectile::TeleportInstigator, TeleportDelay);//2nd Timer
 
 	// Skip base implementation as it will destroy actor (we need to stay alive a bit longer to finish the 2nd timer)
 	//Super::Explode_Implementation();
@@ -68,7 +68,7 @@ void ASDashProjectile::TeleportInstigator()
 		}
 
 	}
-	EffectComp->ActivateSystem();
+	//EffectComp->ActivateSystem();
 	// Now we're ready to destroy self
-	Destroy();
+	//Destroy();
 }
