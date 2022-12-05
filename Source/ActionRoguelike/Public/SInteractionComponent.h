@@ -16,6 +16,9 @@ public:
 
 	void PrimaryInteract();
 
+	UPROPERTY(EditDefaultsOnly, Category = "Trace")
+		float TraceDistance;
+
 
 public:	
 	// Sets default values for this component's properties

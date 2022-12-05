@@ -14,7 +14,7 @@ USInteractionComponent::USInteractionComponent()
 	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
 	// off to improve performance if you don't need them.
 	PrimaryComponentTick.bCanEverTick = true;
-
+	TraceDistance = 500.0f;
 	// ...
 }
 
@@ -47,13 +47,14 @@ void USInteractionComponent::PrimaryInteract()
 		
 	FVector EyeLocation;
 	FRotator EyeRotation;
-
-	MyOwner->GetActorEyesViewPoint(EyeLocation, EyeRotation);
-
-	FVector End = EyeLocation + (EyeRotation.Vector() * 1000);
-	End.Y += 150;
 	
 
+	MyOwner->GetActorEyesViewPoint(EyeLocation, EyeRotation);
+	EyeRotation.Add(0, 15, 0);
+
+	FVector End = EyeLocation + (EyeRotation.Vector() * TraceDistance);
+	//End.Y += 150;
+	//UE_LOG(LogTemp, Warning, TEXT("The vector value is: %s"), *End.ToString());
 	//FHitResult Hit;
 	//bool bBlockingHit = GetWorld()->LineTraceSingleByObjectType(Hit, EyeLocation, End, ObjectQueryParams);
 
