@@ -4,7 +4,7 @@
 #include "SPowerup_HealthPotion.h"
 #include "SAttributeComponent.h"
 
-ASPowerup_HeatlhPotion::ASPowerup_HeatlhPotion()
+ASPowerup_HealthPotion::ASPowerup_HealthPotion()
 {
 	MeshComp = CreateDefaultSubobject<UStaticMeshComponent>("MeshComp");
 	//Disable collision,use base class SphereComp to handle interaction queries
@@ -13,7 +13,7 @@ ASPowerup_HeatlhPotion::ASPowerup_HeatlhPotion()
 
 }
 
-void ASPowerup_HeatlhPotion::Interact_Implementation(APawn* InstigatorPawn)
+void ASPowerup_HealthPotion::Interact_Implementation(APawn* InstigatorPawn)
 {
 	if (!ensure(InstigatorPawn))
 	{
@@ -31,3 +31,4 @@ void ASPowerup_HeatlhPotion::Interact_Implementation(APawn* InstigatorPawn)
 		}
 	}
 }
+

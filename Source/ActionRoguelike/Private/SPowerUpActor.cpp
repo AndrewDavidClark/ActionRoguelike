@@ -31,7 +31,7 @@ void ASPowerUpActor::HideAndCooldownPowerup()
     SetPowerUpState(false);
 
     GetWorldTimerManager().SetTimer(TimerHandle_RespawnTimer, this, &ASPowerUpActor::ShowPowerup, RespawnTime);
-}
+ }
 
 void ASPowerUpActor::SetPowerUpState(bool bNewIsActive)
 {

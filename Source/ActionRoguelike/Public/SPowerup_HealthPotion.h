@@ -11,7 +11,7 @@ class UStaticMeshComponent;
  *
  */
 UCLASS()
-class ACTIONROGUELIKE_API ASPowerup_HeatlhPotion : public ASPowerUpActor
+class ACTIONROGUELIKE_API ASPowerup_HealthPotion : public ASPowerUpActor
 {
 	GENERATED_BODY()
 
@@ -24,7 +24,7 @@ protected:
 public:
 	void Interact_Implementation(APawn* InstigatorPawn) override;
 
-	ASPowerup_HeatlhPotion();
+	ASPowerup_HealthPotion();
 
 
 };

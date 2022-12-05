@@ -29,8 +29,8 @@ ASProjectileBase::ASProjectileBase()
 	MoveComp->ProjectileGravityScale = 0.0f;
 	MoveComp->InitialSpeed = 8000;
 
-	ImpactShakeInnerRadius = 250.0f;
-	ImpactShakeOuterRadius = 2500.0f;
+	ImpactShakeInnerRadius = 0.0f;
+	ImpactShakeOuterRadius = 1500.0f;
 }
 
 
@@ -54,6 +54,7 @@ void ASProjectileBase::Explode_Implementation()
 		UGameplayStatics::PlaySoundAtLocation(this, ImpactSound, GetActorLocation());
 
 		UGameplayStatics::PlayWorldCameraShake(this, ImpactShake, GetActorLocation(), ImpactShakeInnerRadius, ImpactShakeOuterRadius);
+		//UGameplayStatics::PlayWorldCameraShake(this, ImpactShake, GetActorLocation(), ImpactShakeInnerRadius, ImpactShakeOuterRadius);
 
 		//EffectComp->DeactivateSystem();
 		 
