@@ -21,7 +21,7 @@ ASProjectileBase::ASProjectileBase()
 	EffectComp->SetupAttachment(RootComponent);
 
 	AudioComp = CreateDefaultSubobject<UAudioComponent>("AudioComp");
-	AudioComp->SetupAttachment(RootComponent);
+	AudioComp->SetupAttachment(RootComponent);//Required for SceneComponents
 
 	MoveComp = CreateDefaultSubobject<UProjectileMovementComponent>("ProjectileMoveComp");
 	MoveComp->bRotationFollowsVelocity = true;
