@@ -45,6 +45,9 @@ protected:
 public:	
 
 	UFUNCTION(BlueprintCallable)
+	bool Kill(AActor* InstigatorActor);
+
+	UFUNCTION(BlueprintCallable)
 	bool IsFullHealth() const;
 
 	UFUNCTION(BlueprintCallable)

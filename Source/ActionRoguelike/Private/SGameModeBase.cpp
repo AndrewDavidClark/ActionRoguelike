@@ -25,6 +25,20 @@ void ASGameModeBase::StartPlay()
 	GetWorldTimerManager().SetTimer(TimerHandle_SpawnBots, this, &ASGameModeBase::SpawnBotTimerElapsed, SpawnTimerInterval, true);
 }
 
+void ASGameModeBase::KillAll()
+{
+	for (TActorIterator<ASAICharacter> It(GetWorld()); It; ++It)//Grabs any instances of a particular class(ASAICharacter) --VERY USEFUL c++ variant of GetAllActorOfClass(BP Node)
+	{
+		ASAICharacter* Bot = *It;
+
+		USAttributeComponent* AttributeComp = USAttributeComponent::GetAttributes(Bot);
+		if (ensure(AttributeComp) && AttributeComp->IsAlive())
+		{
+			AttributeComp->Kill(this); //@fixme: pass in player? for kill crediting
+		}
+	}
+}
+
 void ASGameModeBase::SpawnBotTimerElapsed()
 {
 	int32 NrOfAliveBots = 0;

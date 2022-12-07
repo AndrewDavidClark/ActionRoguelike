@@ -16,7 +16,7 @@ ASCharacter::ASCharacter()
 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
-	RootComponent = CreateDefaultSubobject<USceneComponent>("RootComp");
+	//RootComponent = CreateDefaultSubobject<USceneComponent>("RootComp");//BUG/FEATURE?!?Spawns camera at start location but the player at the RootComp/Scene Origin
 
 	SpringArmComp = CreateDefaultSubobject<USpringArmComponent>("SpringArmComp");
 	SpringArmComp->bUsePawnControlRotation = true;
@@ -44,6 +44,12 @@ void ASCharacter::PostInitializeComponents()
 	AttributeComp->OnHealthChanged.AddDynamic(this, &ASCharacter::OnHealthChanged);
 }
 
+
+
+void ASCharacter::HealSelf(float Amount/* = 100*/)
+{
+	AttributeComp->ApplyHealthChange(this, Amount);
+}
 
 // Called to bind functionality to input
 void ASCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
