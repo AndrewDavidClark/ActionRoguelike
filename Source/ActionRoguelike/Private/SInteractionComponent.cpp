@@ -7,6 +7,9 @@
 #include <Kismet/KismetMathLibrary.h>
 
 
+static TAutoConsoleVariable<bool> CVarDrawInteraction(TEXT("su.InteractionDebugDraw"), false, TEXT("Enable Debug Lines for Interact Component"), ECVF_Cheat);
+
+
 
 // Sets default values for this component's properties
 USInteractionComponent::USInteractionComponent()
@@ -39,18 +42,21 @@ void USInteractionComponent::TickComponent(float DeltaTime, ELevelTick TickType,
 
 void USInteractionComponent::PrimaryInteract()
 {
+
+	bool bDebugDraw = CVarDrawInteraction.GetValueOnGameThread();
+
 	FCollisionObjectQueryParams ObjectQueryParams;
 	ObjectQueryParams.AddObjectTypesToQuery(ECC_WorldDynamic);
 
 	AActor* MyOwner = GetOwner();
 
 		
+
+
 	FVector EyeLocation;
 	FRotator EyeRotation;
-	
-
 	MyOwner->GetActorEyesViewPoint(EyeLocation, EyeRotation);
-	EyeRotation.Add(0, 15, 0);
+	//EyeRotation.Add(0, 15, 0);
 
 	FVector End = EyeLocation + (EyeRotation.Vector() * TraceDistance);
 	//End.Y += 150;
@@ -71,6 +77,10 @@ void USInteractionComponent::PrimaryInteract()
 
 	for (FHitResult Hit : Hits)
 	{
+		if (bDebugDraw)
+		{
+			DrawDebugSphere(GetWorld(), Hit.ImpactPoint, Radius, 32, LineColor, false, 2.0f);
+		}
 		AActor* HitActor = Hit.GetActor();
 		if (HitActor)
 		{
@@ -84,11 +94,11 @@ void USInteractionComponent::PrimaryInteract()
 			}
 			
 	}
-
-		DrawDebugSphere(GetWorld(), Hit.ImpactPoint, Radius, 32, LineColor, false, 2.0f);
-	}
 		
+	}
+	if (bDebugDraw)
+		{
 		DrawDebugLine(GetWorld(), EyeLocation, End, LineColor, false, 2.0f, 0, 2.0f);
-
+		}
 		
 }

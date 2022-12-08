@@ -12,6 +12,8 @@
 #include <Logging/LogMacros.h>
 
 
+static TAutoConsoleVariable<bool> CVarSpawnBots(TEXT("su.SpawnBots"), true, TEXT("Enable spawning of bots via timer"), ECVF_Cheat);//cheat means it will not be included in final build
+
 
 
 ASGameModeBase::ASGameModeBase()
@@ -42,8 +44,15 @@ void ASGameModeBase::KillAll()
 	}
 }
 
+
 void ASGameModeBase::SpawnBotTimerElapsed()
 {
+	if (!CVarSpawnBots.GetValueOnGameThread())
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Bot spawning diabled via cvar 'CVarSpawnBots'."));
+		return;
+	}
+
 	int32 NrOfAliveBots = 0;
 	for (TActorIterator<ASAICharacter> It(GetWorld()); It; ++It)//Grabs any instances of a particular class(ASAICharacter) --VERY USEFUL c++ variant of GetAllActorOfClass(BP Node)
 	{
@@ -76,7 +85,6 @@ void ASGameModeBase::SpawnBotTimerElapsed()
 	{
 		QueryInstance->GetOnQueryFinishedEvent().AddDynamic(this, &ASGameModeBase::OnQueryCompleted);//Event on EQS Query Finish
 	}
-
 
 }
 

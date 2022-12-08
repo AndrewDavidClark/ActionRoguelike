@@ -91,6 +91,8 @@ protected:
 
 	virtual void PostInitializeComponents() override;
 
+	virtual FVector GetPawnViewLocation() const override;//uses third person camera instead of eyes, remove for first person games
+
 	UFUNCTION(Exec)
 	void HealSelf(float Amount = 100);
 

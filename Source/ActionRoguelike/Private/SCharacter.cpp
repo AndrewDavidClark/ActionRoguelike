@@ -46,6 +46,11 @@ void ASCharacter::PostInitializeComponents()
 
 
 
+FVector ASCharacter::GetPawnViewLocation() const
+{
+	return CameraComp->GetComponentLocation();//uses third person camera instead of eyes, remove for first person games
+}
+
 void ASCharacter::HealSelf(float Amount/* = 100*/)
 {
 	AttributeComp->ApplyHealthChange(this, Amount);

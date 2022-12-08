@@ -9,6 +9,10 @@
 #include <SAttributeComponent.h>
 #include "BrainComponent.h"
 #include <SWorldUserWidget.h>
+#include <GameFramework/Character.h>
+#include <Components/CapsuleComponent.h>
+#include <GameFramework/CharacterMovementComponent.h>
+
 
 
 ASAICharacter::ASAICharacter()
@@ -19,6 +23,9 @@ ASAICharacter::ASAICharacter()
 	AttributeComp = CreateDefaultSubobject<USAttributeComponent>("AttributeComp");
 
 	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
+
+	GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_WorldDynamic, ECR_Ignore);
+	GetMesh()->SetGenerateOverlapEvents(true);
 
 	TimeToHitParamName = "TimeToHit";
 
@@ -56,6 +63,7 @@ void ASAICharacter::OnHealthChanged(AActor* InstigatorActor, USAttributeComponen
 
 		GetMesh()->SetScalarParameterValueOnMaterials(TimeToHitParamName, GetWorld()->TimeSeconds);
 
+		//Died
 		if(NewHealth <= 0.0f)
 		{
 			//Stop BT
@@ -69,6 +77,9 @@ void ASAICharacter::OnHealthChanged(AActor* InstigatorActor, USAttributeComponen
 				GetMesh()->SetAllBodiesSimulatePhysics(true);
 				GetMesh()->SetCollisionProfileName("Ragdoll");
 
+
+				GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+				GetCharacterMovement()->DisableMovement();
 
 
 			//Set LifeSpan(how long until we call destroy actor on self)
