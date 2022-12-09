@@ -3,7 +3,7 @@
 
 #include "SPowerUpActor.h"
 #include "Components/SphereComponent.h"
-
+#include "Components/StaticMeshComponent.h"
 
 
 // Sets default values
@@ -12,6 +12,10 @@ ASPowerUpActor::ASPowerUpActor()
     SphereComp = CreateDefaultSubobject<USphereComponent>("SphereComp");
     SphereComp->SetCollisionProfileName("Powerup");
     RootComponent = SphereComp;
+	MeshComp = CreateDefaultSubobject<UStaticMeshComponent>("MeshComp");
+	//Disable collision,use base class SphereComp to handle interaction queries
+	MeshComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	MeshComp->SetupAttachment(RootComponent);
 
 }
 

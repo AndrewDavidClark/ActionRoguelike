@@ -16,8 +16,8 @@ class ACTIONROGUELIKE_API ASPowerup_HealthPotion : public ASPowerUpActor
 	GENERATED_BODY()
 
 protected:
-	UPROPERTY(VisibleAnywhere, Category = "Components")
-		UStaticMeshComponent* MeshComp;
+	UPROPERTY(EditAnywhere, Category = "HealthPotion")
+		int32 CreditCost;
 
 	//float health amount???????
 
