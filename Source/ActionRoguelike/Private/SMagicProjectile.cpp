@@ -7,6 +7,7 @@
 #include <SGameplayFunctionLibrary.h>
 #include <SActionComponent.h>
 #include <GameFramework/ProjectileMovementComponent.h>
+#include <SActionEffect.h>
 
 
 ASMagicProjectile::ASMagicProjectile()
@@ -34,19 +35,15 @@ void ASMagicProjectile::OnActorOverlap(UPrimitiveComponent* OverlappedComponent,
 
 		}
 
-// 		USAttributeComponent* AttributeComp = Cast<USAttributeComponent>(OtherActor->GetComponentByClass(USAttributeComponent::StaticClass()));
-// 		if (AttributeComp)
-// 		{
-// 			// minus in front of DamageAmount to apply the change as damage, not healing
-// 			AttributeComp->ApplyHealthChange(GetInstigator(), -DamageAmount);
-// 
-// 			// Only explode when we hit something valid
-// 			Explode();
-// 		}
-
+		//Apply Damage and Impulse
 		if (USGameplayFunctionLibrary::ApplyDirectionalDamage(GetInstigator(), OtherActor, DamageAmount, SweepResult))
 		{
 			Explode();
+
+			if (ActionComp)//Check for ActionComp and Apply ActionEffect ex. Burning
+			{
+				ActionComp->AddAction(GetInstigator(), BurningActionClass);
+			}
 		}
 	}
 }
