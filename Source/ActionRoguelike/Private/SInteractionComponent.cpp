@@ -35,6 +35,7 @@ void USInteractionComponent::TickComponent(float DeltaTime, ELevelTick TickType,
 
 void USInteractionComponent::FindBestInteractable()
 {
+	
 	bool bDebugDraw = CVarDrawInteraction.GetValueOnGameThread();
 
 	FCollisionObjectQueryParams ObjectQueryParams;
@@ -42,20 +43,12 @@ void USInteractionComponent::FindBestInteractable()
 
 	AActor* MyOwner = GetOwner();
 
-
-
-
 	FVector EyeLocation;
 	FRotator EyeRotation;
 	MyOwner->GetActorEyesViewPoint(EyeLocation, EyeRotation);
 	//EyeRotation.Add(0, 15, 0);
 
 	FVector End = EyeLocation + (EyeRotation.Vector() * TraceDistance);
-	//End.Y += 150;
-	//UE_LOG(LogTemp, Warning, TEXT("The vector value is: %s"), *End.ToString());
-	//FHitResult Hit;
-	//bool bBlockingHit = GetWorld()->LineTraceSingleByObjectType(Hit, EyeLocation, End, ObjectQueryParams);
-
 	TArray<FHitResult> Hits;
 
 	

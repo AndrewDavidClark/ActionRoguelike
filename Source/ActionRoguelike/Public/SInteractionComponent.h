@@ -19,11 +19,6 @@ public:
 
 	
 
-
-public:	
-	// Sets default values for this component's properties
-	USInteractionComponent();
-
 protected:
 	
 	void FindBestInteractable();
@@ -33,6 +28,7 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "UI")
 	TSubclassOf<USWorldUserWidget> DefaultWidgetClass;
 
+	UPROPERTY()
 	USWorldUserWidget* DefaultWidgetInstance;
 
 	UPROPERTY()
@@ -53,5 +49,5 @@ public:
 	
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
-		
+	USInteractionComponent();
 };
