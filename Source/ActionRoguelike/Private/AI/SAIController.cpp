@@ -19,6 +19,6 @@ void ASAIController::BeginPlay()
 	{
 		GetBlackboardComponent()->SetValueAsVector("MoveToLocation", MyPawn->GetActorLocation());
 
-		GetBlackboardComponent()->SetValueAsObject("TargetActor", MyPawn);
+	    GetBlackboardComponent()->SetValueAsObject("TargetActor", MyPawn);
 	}
-}
+ }

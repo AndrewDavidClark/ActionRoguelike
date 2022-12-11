@@ -28,16 +28,28 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "UI")
 	TSubclassOf<UUserWidget> HealthBarWidgetClass;
 
+	/* Widget to display when bot first sees a player. */
+	UPROPERTY(EditDefaultsOnly, Category = "UI")
+	TSubclassOf<UUserWidget> SpottedWidgetClass;
+
+	/* Material parameter for Hitflashes */
 	UPROPERTY(VisibleAnywhere, Category = "Effect")
 	FName TimeToHitParamName;
+
+	/* Key for AI Blackboard 'TargetActor' */
+	UPROPERTY(VisibleAnywhere, Category = "Effects")
+	FName TargetActorKey;
+
+	UFUNCTION(BlueprintCallable, Category = "AI")
+	AActor* GetTargetActor() const;
+
+	UFUNCTION(BlueprintCallable, Category = "AI")
+	void SetTargetActor(AActor* NewTarget);
 
 	virtual void PostInitializeComponents() override;
 
 	UFUNCTION()
 	void OnHealthChanged(AActor* InstigatorActor, USAttributeComponent* OwningComp, float NewHealth, float Delta);
-
-	UFUNCTION()
-	void SetTargetActor(AActor* NewTarget);
 
 	UPROPERTY(VisibleAnywhere, Category = "Components")
 	UPawnSensingComponent* PawnSensingComp;
