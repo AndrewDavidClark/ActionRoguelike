@@ -29,13 +29,19 @@ public:
 protected:
 
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Attributes")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Replicated, Category = "Attributes")
 	float HealthMax;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Attributes")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly,Replicated, Category = "Attributes")
 	float Health;
 
 	//HealthMax,Stamina, Fuel, FuelMax, Strength, Agility, CriticalHitChance
+
+// 	UPROPERTY(ReplicatedUsing="")
+// 	bool bIsAlive;
+
+	UFUNCTION(NetMulticast, Reliable)//@FIXME: mark as unreliable once we move the "state" out of SCharacter//Reliable ex. Chat Message
+	void MulticastHealthChanged(AActor* InstigatorActor, float NewHealth, float Delta);
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Attributes")
 	float Rage;

@@ -3,11 +3,14 @@
 
 #include "SActionComponent.h"
 #include "SAction.h"
+#include <../ActionRoguelike.h>
 
 
 USActionComponent::USActionComponent()
 {
 	PrimaryComponentTick.bCanEverTick = true;
+
+	SetIsReplicatedByDefault(true);
 }
 
 
@@ -26,8 +29,20 @@ void USActionComponent::TickComponent(float DeltaTime, ELevelTick TickType, FAct
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-	FString DebugMsg = GetNameSafe(GetOwner()) + " : " + ActiveGameplayTags.ToStringSimple();
-	GEngine->AddOnScreenDebugMessage(-1, 0.0f, FColor::White, DebugMsg);
+// 	FString DebugMsg = GetNameSafe(GetOwner()) + " : " + ActiveGameplayTags.ToStringSimple();
+// 	GEngine->AddOnScreenDebugMessage(-1, 0.0f, FColor::White, DebugMsg);
+
+	//Draw All Actions
+	for (USAction* Action : Actions)
+		{
+			FColor TextColor = Action->IsRunning() ? FColor::Blue : FColor::White;
+			FString ActionMsg = FString::Printf(TEXT("[%s] Action: %s : IsRunning: %s : Outer: %s"));
+			*GetNameSafe(GetOwner());
+			*Action->ActionName.ToString(),
+			Action->IsRunning() ? TEXT("true") : TEXT("false"),
+			*GetNameSafe(GetOuter());
+			LogOnScreen(this, ActionMsg, TextColor, 0.0f);
+		}
 }
 
 void USActionComponent::AddAction(AActor* Instigator, TSubclassOf<USAction> ActionClass)
@@ -84,6 +99,13 @@ bool USActionComponent::StartActionByName(AActor* Instigator, FName ActionName)
 				GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Red, FailedMsg);
 				continue;
 			}
+			//Is Client?
+			if (!GetOwner()->HasAuthority())
+			{
+
+			ServerStartAction(Instigator, ActionName);
+
+			}
 			Action->StartAction(Instigator);//if succeeds start the action
 			return true;
 		}
@@ -106,3 +128,9 @@ bool USActionComponent::StopActionByName(AActor* Instigator, FName ActionName)
 	}
 	return false;
 }
+
+void USActionComponent::ServerStartAction_Implementation(AActor* Instigator, FName ActionName)
+{
+	StartActionByName(Instigator, ActionName);
+}
+

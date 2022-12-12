@@ -149,7 +149,7 @@ void ASCharacter::OnHealthChanged(AActor* InstigatorActor, USAttributeComponent*
 
 	if (NewHealth <= 0.0f && Delta < 0.0f)
 	{
-		SetActorEnableCollision(false);//set collision false on death
+		//SetActorEnableCollision(false);//set collision false on death
 		//RootComponent->DestroyComponent();//Destroys Player Collision Capsule on death
 		APlayerController* PC = Cast<APlayerController>(GetController());
 		DisableInput(PC);
