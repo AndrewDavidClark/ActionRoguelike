@@ -96,7 +96,7 @@ void ASAICharacter::SetTargetActor(AActor* NewTarget)
 	AAIController* AIC = Cast<AAIController>(GetController());
 	if (AIC)
 	{
-		AIC->GetBlackboardComponent()->SetValueAsObject("TargetActorKey", NewTarget);
+		AIC->GetBlackboardComponent()->SetValueAsObject(TargetActorKey, NewTarget);
 
 	}
 }
@@ -116,8 +116,8 @@ void ASAICharacter::OnPawnSeen(APawn* Pawn)
 {
 	
 	// Ignore if target already set
-  //if (GetTargetActor() != Pawn)
-	//{
+  if (GetTargetActor() != Pawn)
+	{
 		SetTargetActor(Pawn);
 
 		DrawDebugString(GetWorld(), GetActorLocation(), "PLAYER SPOTTED", nullptr, FColor::White, 0.5f, true);
@@ -129,5 +129,5 @@ void ASAICharacter::OnPawnSeen(APawn* Pawn)
 			// May end up behind the minion health bar otherwise.
 			NewWidget->AddToViewport(10);
 		}
-	//}
+	}
 }
