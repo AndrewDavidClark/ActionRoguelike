@@ -9,7 +9,23 @@
 
 
 class UWorld;
-class USActionComponent;
+
+//Struct is good because you guarantee everything arrives at the same time
+USTRUCT()
+struct FActionRepData
+{
+	GENERATED_BODY()
+
+public:
+
+
+	UPROPERTY()
+	bool bIsRunning;
+
+	UPROPERTY()
+	AActor* Instigator;
+};
+//class USActionComponent;
 /**
  * 
  */
@@ -32,11 +48,12 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Tags")
 	FGameplayTagContainer BlockedTags;//Action can only start if owning actor has none of these tags applied
 
-	UPROPERTY(ReplicatedUsing="OnRep_IsRunning")
-	bool bIsRunning;
+	UPROPERTY(ReplicatedUsing="OnRep_RepData")
+	FActionRepData RepData;
+	//bool bIsRunning;
 	
 	UFUNCTION()
-	void OnRep_IsRunning();
+	void OnRep_RepData();
 
 public:
 
