@@ -7,7 +7,9 @@
 #include "SGameplayInterface.h"
 #include "SPowerUpActor.generated.h"
 
+
 class USphereComponent;
+class UStaticMeshComponent;
 
 UCLASS()
 class ACTIONROGUELIKE_API ASPowerUpActor : public AActor, public ISGameplayInterface//Dont forget to implement GameplayInterface
@@ -15,7 +17,14 @@ class ACTIONROGUELIKE_API ASPowerUpActor : public AActor, public ISGameplayInter
 	GENERATED_BODY()
 
 protected:
-	
+
+	UPROPERTY(ReplicatedUsing = "OnRep_IsActive")
+		bool bIsActive;
+
+	UFUNCTION()
+		void OnRep_IsActive();
+
+		
 	UPROPERTY(EditAnywhere, Category = "PowerUp")
 	float RespawnTime;
 
@@ -32,7 +41,7 @@ protected:
 	USphereComponent* SphereComp;
 
 	UPROPERTY(VisibleAnywhere, Category = "Components")
-		UStaticMeshComponent* MeshComp;
+	UStaticMeshComponent* MeshComp;
 
 public:	
 

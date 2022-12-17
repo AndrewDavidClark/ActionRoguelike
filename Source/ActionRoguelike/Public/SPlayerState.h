@@ -6,7 +6,12 @@
 #include "GameFramework/PlayerState.h"
 #include "SPlayerState.generated.h"
 
+//class ASPlayerState;
+
+
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FOnCreditsChanged, ASPlayerState*, PlayerState, int32, NewCredits, int32, Delta);
+
+class USSaveGame;
 
 /**
  * 
@@ -18,8 +23,12 @@ class ACTIONROGUELIKE_API ASPlayerState : public APlayerState
 
 protected:
 
-	UPROPERTY(EditDefaultsOnly, Category = "Credits")
-	int32 Credits;
+	UPROPERTY(EditDefaultsOnly, ReplicatedUsing="OnRep_Credits", Category = "Credits")
+		int32 Credits;
+
+	//OnRep_ can use a parameter containing the 'old value' of the variable it is bound to. Very useful in this case to figure out the 'delta'
+	UFUNCTION()
+	void OnRep_Credits(int32 OldCredits);
 	
 public:
 
@@ -34,5 +43,11 @@ public:
 
 	UPROPERTY(BlueprintAssignable, Category = "Events")
 	FOnCreditsChanged OnCreditsChanged;
+
+	UFUNCTION(BlueprintNativeEvent)
+	void SavePlayerState(USSaveGame* SaveObject);
+
+	UFUNCTION(BlueprintNativeEvent)
+	void LoadPlayerState(USSaveGame* SaveObject);
 
 };

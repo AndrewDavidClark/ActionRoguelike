@@ -11,6 +11,11 @@
 #include <SCharacter.h>
 #include <Logging/LogMacros.h>
 #include <SPlayerState.h>
+#include <SSaveGame.h>
+#include "Kismet/GameplayStatics.h"
+#include "GameFramework/GameStateBase.h"
+#include <SGameplayInterface.h>
+#include <Serialization/ObjectAndNameAsStringProxyArchive.h>
 
 
 static TAutoConsoleVariable<bool> CVarSpawnBots(TEXT("su.SpawnBots"), true, TEXT("Enable spawning of bots via timer"), ECVF_Cheat);//cheat means it will not be included in final build
@@ -26,6 +31,15 @@ ASGameModeBase::ASGameModeBase()
 	RequiredPowerupDistance = 2000;
 
 	PlayerStateClass = ASPlayerState::StaticClass();
+
+	SlotName = "SaveGame01";
+}
+
+void ASGameModeBase::InitGame(const FString& MapName, const FString& Options, FString& ErrorMessage)
+{
+	Super::InitGame(MapName, Options, ErrorMessage);
+	
+	LoadSaveGame();
 }
 
 void ASGameModeBase::StartPlay()
@@ -51,6 +65,17 @@ void ASGameModeBase::StartPlay()
 	}
 }
 
+void ASGameModeBase::HandleStartingNewPlayer_Implementation(APlayerController* NewPlayer)
+{
+		ASPlayerState* PS = NewPlayer->GetPlayerState<ASPlayerState>();
+	if (ensure(PS))
+	{
+		PS->LoadPlayerState(CurrentSaveGame);
+	}
+
+	Super::HandleStartingNewPlayer_Implementation(NewPlayer);
+}
+
 void ASGameModeBase::KillAll()
 {
 	for (TActorIterator<ASAICharacter> It(GetWorld()); It; ++It)//Grabs any instances of a particular class(ASAICharacter) --VERY USEFUL c++ variant of GetAllActorOfClass(BP Node)
@@ -64,6 +89,8 @@ void ASGameModeBase::KillAll()
 		}
 	}
 }
+
+
 
 
 void ASGameModeBase::SpawnBotTimerElapsed()
@@ -148,49 +175,49 @@ void ASGameModeBase::OnPowerupSpawnQueryCompleted(UEnvQueryInstanceBlueprintWrap
 
 	int32 SpawnCounter = 0;
 	// Break out if we reached the desired count or if we have no more potential positions remaining
-	while (SpawnCounter < DesiredPowerupCount && Locations.Num() > 0)
+while (SpawnCounter < DesiredPowerupCount && Locations.Num() > 0)
+{
+	// Pick a random location from remaining points.
+	int32 RandomLocationIndex = FMath::RandRange(0, Locations.Num() - 1);
+
+	FVector PickedLocation = Locations[RandomLocationIndex];
+	// Remove to avoid picking again
+	Locations.RemoveAt(RandomLocationIndex);
+
+	// Check minimum distance requirement
+	bool bValidLocation = true;
+	for (FVector OtherLocation : UsedLocations)
 	{
-		// Pick a random location from remaining points.
-		int32 RandomLocationIndex = FMath::RandRange(0, Locations.Num() - 1);
+		float DistanceTo = (PickedLocation - OtherLocation).Size();
 
-		FVector PickedLocation = Locations[RandomLocationIndex];
-		// Remove to avoid picking again
-		Locations.RemoveAt(RandomLocationIndex);
-
-		// Check minimum distance requirement
-		bool bValidLocation = true;
-		for (FVector OtherLocation : UsedLocations)
+		if (DistanceTo < RequiredPowerupDistance)
 		{
-			float DistanceTo = (PickedLocation - OtherLocation).Size();
+			// Show skipped locations due to distance
+			//DrawDebugSphere(GetWorld(), PickedLocation, 50.0f, 20, FColor::Red, false, 10.0f);
 
-			if (DistanceTo < RequiredPowerupDistance)
-			{
-				// Show skipped locations due to distance
-				//DrawDebugSphere(GetWorld(), PickedLocation, 50.0f, 20, FColor::Red, false, 10.0f);
-
-				// too close, skip to next attempt
-				bValidLocation = false;
-				break;
-			}
+			// too close, skip to next attempt
+			bValidLocation = false;
+			break;
 		}
-
-		// Failed the distance test
-		if (!bValidLocation)
-		{
-			continue;
-		}
-
-		// Pick a random powerup-class
-		int32 RandomClassIndex = FMath::RandRange(0, PowerupClasses.Num() - 1);
-		TSubclassOf<AActor> RandomPowerupClass = PowerupClasses[RandomClassIndex];
-
-		GetWorld()->SpawnActor<AActor>(RandomPowerupClass, PickedLocation, FRotator::ZeroRotator);
-
-		// Keep for distance checks
-		UsedLocations.Add(PickedLocation);
-		SpawnCounter++;
-		UE_LOG(LogTemp, Warning, TEXT("Spawn powerup EQS success"));
 	}
+
+	// Failed the distance test
+	if (!bValidLocation)
+	{
+		continue;
+	}
+
+	// Pick a random powerup-class
+	int32 RandomClassIndex = FMath::RandRange(0, PowerupClasses.Num() - 1);
+	TSubclassOf<AActor> RandomPowerupClass = PowerupClasses[RandomClassIndex];
+
+	GetWorld()->SpawnActor<AActor>(RandomPowerupClass, PickedLocation, FRotator::ZeroRotator);
+
+	// Keep for distance checks
+	UsedLocations.Add(PickedLocation);
+	SpawnCounter++;
+	UE_LOG(LogTemp, Warning, TEXT("Spawn powerup EQS success"));
+}
 }
 
 
@@ -218,17 +245,114 @@ void ASGameModeBase::OnActorKilled(AActor* VictimActor, AActor* Killer)
 		Delegate.BindUFunction(this, "RespawnPlayerElapsed", Player->GetController());
 
 		UPROPERTY(EditDefaultsOnly, Category = "Settings")
-		float RespawnDelay = 2.0f;
+			float RespawnDelay = 2.0f;
 		GetWorldTimerManager().SetTimer(TimerHandle_RespawnDelay, Delegate, RespawnDelay, false);
 	}
 
 	// Give Credits for kill
-		APawn* KillerPawn = Cast<APawn>(Killer);
+	APawn* KillerPawn = Cast<APawn>(Killer);
 	if (KillerPawn)
 	{
 		if (ASPlayerState* PS = KillerPawn->GetPlayerState<ASPlayerState>()) // < can cast and check for nullptr within if-statement.
 		{
 			PS->AddCredits(CreditsPerKill);
 		}
+	}
+}
+
+void ASGameModeBase::WriteSaveGame()
+{
+	//Iterate all player states, we don't have proper ID to match yet (requires Steam or EOS)
+	for (int32 i = 0; i < GameState->PlayerArray.Num(); i++)
+	{
+		ASPlayerState* PS = Cast<ASPlayerState>(GameState->PlayerArray[i]);
+		if (PS)
+		{
+			PS->SavePlayerState(CurrentSaveGame);
+			break; //single player only at this point
+		}
+	}
+
+	CurrentSaveGame->SavedActors.Empty();
+
+	//Iterate the entire world of actors
+	for (FActorIterator It(GetWorld()); It; ++It)
+	{
+	AActor* Actor = *It;
+	//Only interested in our 'gameplay actors'
+	if (!Actor->Implements<USGameplayInterface>())
+	{
+		continue;
+	}
+
+	FActorSaveData ActorData;
+	ActorData.ActorName = Actor->GetName();
+	ActorData.Transform = Actor->GetActorTransform();
+
+	//Pass the array to fill with data from Actor
+	FMemoryWriter MemWriter(ActorData.ByteData);
+
+	FObjectAndNameAsStringProxyArchive Ar(MemWriter, true);
+	// Find only variables with UPROPERTY(SaveGame)
+	Ar.ArIsSaveGame = true;
+    //Converts Actor's SaveGame UPROPERTIES into binary array
+	Actor->Serialize(Ar);
+
+
+
+	CurrentSaveGame->SavedActors.Add(ActorData);
+}
+
+	UGameplayStatics::SaveGameToSlot(CurrentSaveGame, SlotName, 0);
+}
+
+void ASGameModeBase::LoadSaveGame()
+{
+	if (UGameplayStatics::DoesSaveGameExist(SlotName, 0))
+	{
+		CurrentSaveGame = Cast<USSaveGame>(UGameplayStatics::LoadGameFromSlot(SlotName, 0));
+		if (CurrentSaveGame == nullptr)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Failed to load SaveGame Data."));
+			return;
+		}
+		UE_LOG(LogTemp, Warning, TEXT("Loaded SaveGame Data."));
+
+		//Iterate the entire world of actors
+		for (FActorIterator It(GetWorld()); It; ++It)
+		{
+			AActor* Actor = *It;
+			//Only interested in our 'gameplay actors'
+			if (!Actor->Implements<USGameplayInterface>())
+			{
+				continue;
+			}
+
+			for (FActorSaveData ActorData : CurrentSaveGame->SavedActors)
+			{
+				if (ActorData.ActorName == Actor->GetName())
+				{
+				Actor->SetActorTransform(ActorData.Transform);
+
+				FMemoryReader MemReader(ActorData.ByteData);
+
+				FObjectAndNameAsStringProxyArchive Ar(MemReader, true);
+				Ar.ArIsSaveGame = true;
+				// Convert binary array back into actor's variables
+				Actor->Serialize(Ar);
+
+				ISGameplayInterface::Execute_OnActorLoaded(Actor);
+
+				break;
+				}
+			}
+		}
+	}
+
+	else
+	{
+		CurrentSaveGame = Cast<USSaveGame>(UGameplayStatics::CreateSaveGameObject(USSaveGame::StaticClass()));
+
+		UE_LOG(LogTemp, Warning, TEXT("Created New SaveGame Data."));
 	}
 }

@@ -4,6 +4,7 @@
 #include "SPowerUpActor.h"
 #include "Components/SphereComponent.h"
 #include "Components/StaticMeshComponent.h"
+#include "Net/UnrealNetwork.h"
 
 
 // Sets default values
@@ -18,6 +19,7 @@ ASPowerUpActor::ASPowerUpActor()
 	MeshComp->SetupAttachment(RootComponent);
 
     RespawnTime = 10.0f;
+	bIsActive = true;
 
     SetReplicates(true);
 
@@ -31,22 +33,32 @@ void ASPowerUpActor::Interact_Implementation(APawn* InstigatorPawn)
 
 void ASPowerUpActor::ShowPowerup()
 {
-    SetPowerUpState(true);
+	SetPowerUpState(true);
 }
 
 void ASPowerUpActor::HideAndCooldownPowerup()
 {
-    SetPowerUpState(false);
+	SetPowerUpState(false);
 
-    GetWorldTimerManager().SetTimer(TimerHandle_RespawnTimer, this, &ASPowerUpActor::ShowPowerup, RespawnTime);
- }
+	GetWorldTimerManager().SetTimer(TimerHandle_RespawnTimer, this, &ASPowerUpActor::ShowPowerup, RespawnTime);
+}
 
 void ASPowerUpActor::SetPowerUpState(bool bNewIsActive)
 {
-    SetActorEnableCollision(bNewIsActive);
-   
-
-    //set visibility on the root and all children comps
-    RootComponent->SetVisibility(bNewIsActive, true);
+	bIsActive = bNewIsActive;
+	OnRep_IsActive();
 }
 
+void ASPowerUpActor::OnRep_IsActive()
+{
+    SetActorEnableCollision(bIsActive);
+    //Set visibility on root and all children
+    RootComponent->SetVisibility(bIsActive, true);
+}
+
+void ASPowerUpActor::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(ASPowerUpActor, bIsActive);
+}
