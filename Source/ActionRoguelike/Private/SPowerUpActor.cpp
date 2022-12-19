@@ -7,6 +7,8 @@
 #include "Net/UnrealNetwork.h"
 
 
+
+
 // Sets default values
 ASPowerUpActor::ASPowerUpActor()
 {
@@ -30,6 +32,10 @@ void ASPowerUpActor::Interact_Implementation(APawn* InstigatorPawn)
     //logic will come in the derived class...
 }
 
+FText ASPowerUpActor::GetInteractText_Implementation(APawn* InstigatorPawn)
+{
+	return FText::GetEmpty();
+}
 
 void ASPowerUpActor::ShowPowerup()
 {
