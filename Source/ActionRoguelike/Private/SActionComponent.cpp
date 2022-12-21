@@ -7,6 +7,7 @@
 #include <Net/UnrealNetwork.h>
 #include <Engine/ActorChannel.h>
 
+DECLARE_CYCLE_STAT(TEXT("StartActionByName"), STAT_StartActionByName, STATGROUP_STANFORD);
 
 USActionComponent::USActionComponent()
 {
@@ -32,6 +33,21 @@ void USActionComponent::BeginPlay()
 }
 
 
+
+void USActionComponent::EndPlay(const EEndPlayReason::Type EndPlayReason)
+{
+	//Stop all
+	TArray<USAction*> ActionsCopy = Actions;
+	for (USAction* Action : ActionsCopy)
+	{
+		if (Action && Action->IsRunning())
+		{
+			Action->StopAction(GetOwner());
+		}
+	}
+
+	Super::EndPlay(EndPlayReason);
+}
 
 void USActionComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
@@ -103,6 +119,8 @@ USAction* USActionComponent::GetAction(TSubclassOf<USAction> ActionClass) const
 
 bool USActionComponent::StartActionByName(AActor* Instigator, FName ActionName)
 {
+	SCOPE_CYCLE_COUNTER(STAT_StartActionByName);
+
 	for (USAction* Action : Actions)
 	{
 		if (Action && Action->ActionName == ActionName)
@@ -118,6 +136,10 @@ bool USActionComponent::StartActionByName(AActor* Instigator, FName ActionName)
 			{
 			ServerStartAction(Instigator, ActionName);
 			}
+
+			//Bookmark for Unreal Insights
+			TRACE_BOOKMARK(TEXT("StartAction::%s"), *GetNameSafe(Action));
+
 			Action->StartAction(Instigator);//if succeeds start the action
 			return true;
 		}
